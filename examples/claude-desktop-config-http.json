@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "prompt-house": {
+      "url": "https://prompthouse.app/api/mcp-link?accessLink=your-access-link-here",
+      "transport": "http"
+    }
+  }
+}

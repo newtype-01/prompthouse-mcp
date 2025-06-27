@@ -1,0 +1,67 @@
+{
+  "dxt_version": "1.0",
+  "name": "prompthouse-mcp",
+  "version": "1.0.0",
+  "display_name": "PromptHouse MCP",
+  "description": "Connect to your PromptHouse prompts directly in Claude Desktop",
+  "long_description": "This extension allows you to access, search, and execute your saved PromptHouse prompts directly within Claude Desktop. Get instant access to your prompt library without leaving your conversation.\n\nFeatures:\n- List all your saved prompts\n- Retrieve prompt content by ID\n- Supports both online and local PromptHouse servers\n- Secure access-link authentication",
+  "author": {
+    "name": "PromptHouse",
+    "url": "https://prompthouse.app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/newtype-01/prompthouse-mcp"
+  },
+  "homepage": "https://prompthouse.app",
+  "server": {
+    "type": "node",
+    "entry_point": "server.js"
+  },
+  "user_config": {
+    "access_link": {
+      "type": "string",
+      "title": "PromptHouse Access Link",
+      "description": "Your personal access link from PromptHouse settings page. Go to https://prompthouse.app, sign in, and click 'Set Up MCP' to get your link.",
+      "required": true,
+      "sensitive": true
+    },
+    "mode": {
+      "type": "string",
+      "title": "Connection Mode",
+      "description": "Choose between web (online PromptHouse) or local server",
+      "enum": ["web", "local"],
+      "default": "web"
+    },
+    "debug": {
+      "type": "boolean",
+      "title": "Debug Mode",
+      "description": "Enable detailed logging for troubleshooting",
+      "default": false
+    }
+  },
+  "tools": [
+    {
+      "name": "get_prompt_list",
+      "description": "List all available prompts with titles, descriptions, and tags"
+    },
+    {
+      "name": "get_prompt",
+      "description": "Retrieve complete prompt content by ID including messages and metadata"
+    }
+  ],
+  "icon": "icon.png",
+  "keywords": [
+    "prompts",
+    "productivity", 
+    "templates",
+    "ai",
+    "claude",
+    "mcp"
+  ],
+  "license": "MIT",
+  "compatibility": {
+    "platform": ["darwin", "win32", "linux"],
+    "node": ">=16"
+  }
+}

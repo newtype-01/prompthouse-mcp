@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "prompt-house": {
+      "command": "npx",
+      "args": ["prompthouse-mcp"],
+      "env": {
+        "PROMPTHOUSE_ACCESS_LINK": "your-access-link-here"
+      }
+    }
+  }
+}

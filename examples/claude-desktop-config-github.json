@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "prompt-house": {
+      "command": "npx",
+      "args": ["github:newtype-01/prompthouse-mcp"],
+      "env": {
+        "PROMPTHOUSE_ACCESS_LINK": "your-access-link-here",
+        "PROMPTHOUSE_MODE": "web"
+      }
+    }
+  }
+}

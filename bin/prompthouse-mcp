@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+/**
+ * PromptHouse MCP Server CLI Entry Point
+ * 
+ * This script starts the MCP server for PromptHouse, allowing AI clients
+ * like Claude Desktop to access your prompts via the Model Context Protocol.
+ */
+
+require('../lib/index.js')();

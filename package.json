@@ -1,0 +1,42 @@
+{
+  "name": "prompthouse-mcp",
+  "version": "1.0.0",
+  "description": "PromptHouse MCP Server for Claude Desktop and other AI clients",
+  "main": "lib/index.js",
+  "bin": {
+    "prompthouse-mcp": "./bin/prompthouse-mcp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/newtype-01/prompthouse-mcp.git"
+  },
+  "homepage": "https://prompthouse.app",
+  "keywords": [
+    "mcp",
+    "claude", 
+    "prompthouse",
+    "ai",
+    "prompt",
+    "model-context-protocol",
+    "claude-desktop"
+  ],
+  "author": {
+    "name": "PromptHouse",
+    "url": "https://prompthouse.app"
+  },
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "start": "node lib/index.js",
+    "test": "node scripts/test.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ]
+}
