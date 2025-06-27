@@ -4,16 +4,16 @@
   "description": "PromptHouse MCP Server for Claude Desktop and other AI clients",
   "main": "lib/index.js",
   "bin": {
-    "prompthouse-mcp": "./bin/prompthouse-mcp"
+    "prompthouse-mcp": "bin/prompthouse-mcp"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/newtype-01/prompthouse-mcp.git"
+    "url": "git+https://github.com/newtype-01/prompthouse-mcp.git"
   },
   "homepage": "https://prompthouse.app",
   "keywords": [
     "mcp",
-    "claude", 
+    "claude",
     "prompthouse",
     "ai",
     "prompt",
