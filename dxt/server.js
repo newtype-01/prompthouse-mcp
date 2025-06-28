@@ -10,11 +10,80 @@
 const readline = require('readline');
 const https = require('https');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-// DXT Configuration mapping
-const ACCESS_LINK = process.env.access_link;
-const MODE = process.env.mode || 'web';
-const DEBUG = process.env.debug === 'true';
+/**
+ * Enhanced configuration loading for DXT
+ * Tries multiple sources to find configuration
+ */
+function loadConfiguration() {
+  const config = {
+    accessLink: null,
+    mode: 'web',
+    debug: false
+  };
+
+  // Method 1: Environment variables (standard DXT way)
+  config.accessLink = process.env.access_link || process.env.PROMPTHOUSE_ACCESS_LINK;
+  config.mode = process.env.mode || process.env.PROMPTHOUSE_MODE || 'web';
+  config.debug = (process.env.debug === 'true') || (process.env.PROMPTHOUSE_DEBUG === 'true');
+
+  // Method 2: Command line arguments
+  const args = process.argv.slice(2);
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--access-link=')) {
+      config.accessLink = args[i].split('=')[1];
+    } else if (args[i].startsWith('--mode=')) {
+      config.mode = args[i].split('=')[1];
+    } else if (args[i] === '--debug') {
+      config.debug = true;
+    }
+  }
+
+  // Method 3: Try to read from DXT config file
+  try {
+    const configPaths = [
+      path.join(process.cwd(), 'config.json'),
+      path.join(__dirname, 'config.json'),
+      path.join(process.env.HOME || '', '.claude', 'extensions', 'prompthouse-mcp', 'config.json')
+    ];
+    
+    for (const configPath of configPaths) {
+      if (fs.existsSync(configPath)) {
+        const fileConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        config.accessLink = config.accessLink || fileConfig.access_link || fileConfig.accessLink;
+        config.mode = config.mode || fileConfig.mode || 'web';
+        config.debug = config.debug || fileConfig.debug || false;
+        console.error('[PromptHouse MCP DXT] Loaded config from:', configPath);
+        break;
+      }
+    }
+  } catch (error) {
+    console.error('[PromptHouse MCP DXT] Config file read error:', error.message);
+  }
+
+  // Debug output
+  if (config.debug) {
+    console.error('[PromptHouse MCP DXT] Configuration loaded:');
+    console.error('  Access Link:', config.accessLink ? 'PROVIDED' : 'MISSING');
+    console.error('  Mode:', config.mode);
+    console.error('  Debug:', config.debug);
+    console.error('  Environment variables:');
+    console.error('    access_link:', process.env.access_link ? 'SET' : 'NOT_SET');
+    console.error('    PROMPTHOUSE_ACCESS_LINK:', process.env.PROMPTHOUSE_ACCESS_LINK ? 'SET' : 'NOT_SET');
+    console.error('    mode:', process.env.mode || 'NOT_SET');
+    console.error('    debug:', process.env.debug || 'NOT_SET');
+  }
+
+  return config;
+}
+
+// Load configuration
+const CONFIG = loadConfiguration();
+const ACCESS_LINK = CONFIG.accessLink;
+const MODE = CONFIG.mode;
+const DEBUG = CONFIG.debug;
 
 // Server endpoints
 const ENDPOINTS = {
@@ -121,12 +190,30 @@ async function handleMessage(message) {
  * Main function
  */
 function main() {
+  // Enhanced error reporting
   if (!ACCESS_LINK) {
+    console.error('\n=== PromptHouse MCP DXT Configuration Error ===');
     console.error('Error: access_link configuration is required');
-    console.error('Please configure your PromptHouse access link in the DXT extension settings.');
+    console.error('\nDebugging information:');
+    console.error('  Working directory:', process.cwd());
+    console.error('  Script directory:', __dirname);
+    console.error('  Command line args:', process.argv);
+    console.error('\nEnvironment variables:');
+    Object.keys(process.env).filter(key => 
+      key.includes('access') || key.includes('mode') || key.includes('debug') || key.includes('PROMPT')
+    ).forEach(key => {
+      console.error(`  ${key}:`, process.env[key] || 'NOT_SET');
+    });
+    console.error('\nPlease configure your PromptHouse access link in the DXT extension settings.');
+    console.error('If the problem persists, try the NPM method: npx prompthouse-mcp\n');
     process.exit(1);
   }
 
+  console.error('[PromptHouse MCP DXT] Starting with configuration:');
+  console.error('  Access Link: PROVIDED');
+  console.error('  Mode:', MODE);
+  console.error('  Debug:', DEBUG);
+  
   debug('Starting DXT MCP Server');
   debug('Mode:', MODE);
 
