@@ -15,7 +15,7 @@
   },
   "homepage": "https://prompthouse.app",
   "server": {
-    "type": "stdio",
+    "type": "node",
     "command": "node",
     "args": ["server.js"]
   },
