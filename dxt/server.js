@@ -111,7 +111,7 @@ function debug(...args) {
 }
 
 /**
- * Make API request
+ * Make API request with enhanced error handling
  */
 function makeApiRequest(message) {
   return new Promise((resolve, reject) => {
@@ -137,18 +137,43 @@ function makeApiRequest(message) {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
+        debug('API Response received, length:', data.length, 'status:', res.statusCode);
+        
+        // Handle empty responses
+        if (!data || data.trim() === '') {
+          debug('Empty response received');
+          reject(new Error('Empty response from API'));
+          return;
+        }
+
+        // Handle non-200 status codes
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          debug('HTTP error status:', res.statusCode, 'response:', data.substring(0, 200));
+          reject(new Error(`HTTP ${res.statusCode}: ${data.substring(0, 100)}`));
+          return;
+        }
+
         try {
-          resolve(JSON.parse(data));
+          const parsed = JSON.parse(data);
+          debug('Successfully parsed JSON response');
+          resolve(parsed);
         } catch (error) {
-          reject(new Error(`Invalid JSON: ${error.message}`));
+          debug('JSON parse error:', error.message, 'Raw data length:', data.length);
+          debug('Raw data preview:', data.substring(0, 200));
+          reject(new Error(`Invalid JSON response: ${error.message}`));
         }
       });
     });
 
-    req.on('error', reject);
+    req.on('error', (error) => {
+      debug('Request error:', error.message);
+      reject(error);
+    });
+    
     req.setTimeout(10000, () => {
+      debug('Request timeout');
       req.destroy();
-      reject(new Error('Request timeout'));
+      reject(new Error('Request timeout after 10 seconds'));
     });
 
     req.write(postData);
@@ -157,32 +182,74 @@ function makeApiRequest(message) {
 }
 
 /**
- * Handle MCP messages
+ * Handle MCP messages with robust error handling
  */
 async function handleMessage(message) {
   try {
-    debug('Handling message:', message.method);
+    debug('Handling message:', message.method, 'id:', message.id);
 
-    // Handle notifications (no response)
+    // Validate input message
+    if (!message || typeof message !== 'object') {
+      throw new Error('Invalid message format');
+    }
+
+    if (!message.method) {
+      throw new Error('Missing method in message');
+    }
+
+    // Handle notifications (no response expected)
     if (message.method === 'notifications/initialized') {
-      await makeApiRequest(message);
+      try {
+        await makeApiRequest(message);
+      } catch (error) {
+        debug('Notification failed (ignoring):', error.message);
+      }
       return null;
     }
 
-    // Forward to API
-    return await makeApiRequest(message);
+    // Forward to API and return response
+    const response = await makeApiRequest(message);
+    
+    // Validate the response structure
+    if (!response || typeof response !== 'object') {
+      throw new Error('Invalid API response format');
+    }
+
+    // Ensure response has required fields
+    if (!response.jsonrpc) {
+      response.jsonrpc = '2.0';
+    }
+
+    if (response.id === undefined && message.id !== undefined) {
+      response.id = message.id;
+    }
+
+    debug('Response ready for message:', message.method);
+    return response;
 
   } catch (error) {
-    debug('Error:', error.message);
-    return {
+    debug('Error handling message:', error.message);
+    
+    // Create proper JSON-RPC error response
+    const errorResponse = {
       jsonrpc: '2.0',
-      id: message.id || null,
+      id: (message && message.id !== undefined) ? message.id : null,
       error: {
         code: -32603,
-        message: 'Internal error',
-        data: DEBUG ? error.message : undefined
+        message: 'Internal error'
       }
     };
+
+    // Add error details in debug mode
+    if (DEBUG) {
+      errorResponse.error.data = {
+        originalError: error.message,
+        method: message ? message.method : 'unknown',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    return errorResponse;
   }
 }
 
@@ -224,23 +291,50 @@ function main() {
   });
 
   rl.on('line', async (line) => {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) {
+      return; // Skip empty lines
+    }
+
+    let message = null;
+    
     try {
-      const message = JSON.parse(line.trim());
+      // Parse the incoming JSON-RPC message
+      message = JSON.parse(trimmedLine);
+      debug('Received message:', message.method, 'id:', message.id);
+      
+      // Handle the message
       const response = await handleMessage(message);
       
-      if (response) {
-        console.log(JSON.stringify(response));
+      // Send response if one is expected
+      if (response !== null) {
+        const responseStr = JSON.stringify(response);
+        debug('Sending response:', responseStr.substring(0, 100) + (responseStr.length > 100 ? '...' : ''));
+        console.log(responseStr);
       }
-    } catch (error) {
-      debug('Parse error:', error.message);
-      console.log(JSON.stringify({
+      
+    } catch (parseError) {
+      debug('Parse error for line:', trimmedLine.substring(0, 100));
+      debug('Parse error details:', parseError.message);
+      
+      // Create parse error response
+      const errorResponse = {
         jsonrpc: '2.0',
-        id: null,
+        id: null, // Can't get ID from malformed JSON
         error: {
           code: -32700,
           message: 'Parse error'
         }
-      }));
+      };
+
+      if (DEBUG) {
+        errorResponse.error.data = {
+          originalError: parseError.message,
+          receivedData: trimmedLine.substring(0, 200)
+        };
+      }
+
+      console.log(JSON.stringify(errorResponse));
     }
   });
 
