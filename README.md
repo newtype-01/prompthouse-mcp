@@ -1,4 +1,35 @@
-# PromptHouse MCP Server
+# Prompt House: Supercharge Your AI Workflow
+
+**Your Personal Prompt Library, Intelligently Connected to Your Favorite AI Tools.**
+
+Tired of juggling a messy collection of prompts across notes, files, and spreadsheets? Prompt House is a powerful prompt manager that not only helps you save, tag, and organize your prompts but makes them instantly accessible to your AI clients.
+
+It leverages the MCP (Model Context Protocol), which allows your AI applications to programmatically find and use the perfect prompt from your library. This creates an effortless and seamless workflow, eliminating the need for constant copy-pasting.
+
+## ✨ Key Features
+
+- **Prompt Management**: Effortlessly save, tag, and manage your entire prompt library. Our clean interface allows you to find, view, and edit prompts in seconds. Use tags to instantly filter and locate the exact prompt you need.
+
+- **Prompt Calling**: Transform your workflow from manual to automatic. By setting up the MCP connection, you empower clients like Cursor, ChatWise, and Cherry Studio to intelligently fetch and execute prompts directly from your collection.
+
+- **Prompt Recommendations**: Explore a built-in collection of high-quality prompts for a variety of tasks, including Productivity and Image Generation. It's a great way to discover new techniques and expand your creative toolkit.
+
+- **Privacy-First macOS Client**: Enjoy the speed and security of a native macOS application. All your data is stored locally on your machine. No accounts, no sign-ups, no cloud sync. The client also features native support for major Model Providers and local inference with Ollama.
+
+## 🔗 How to Connect
+
+**For the Web Version:**
+- NPM Package
+- HTTP Bridge  
+- DXT Extension
+
+**For the macOS App:**
+- Manual Configuration: Set up a connection via HTTP or Stdio
+- Auto-Configuration: Enjoy one-click setup for Claude Desktop
+
+---
+
+## PromptHouse MCP Server
 
 Connect your [PromptHouse](https://prompthouse.app) prompts directly to Claude Desktop and other AI clients using the Model Context Protocol (MCP).
 
