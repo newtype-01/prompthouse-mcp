@@ -6,6 +6,12 @@ Tired of juggling a messy collection of prompts across notes, files, and spreads
 
 It leverages the MCP (Model Context Protocol), which allows your AI applications to programmatically find and use the perfect prompt from your library. This creates an effortless and seamless workflow, eliminating the need for constant copy-pasting.
 
+Created by huangyihe
+- Prompt House: https://prompthouse.app/
+- YouTube: https://www.youtube.com/@huanyihe777
+- Twitter: https://x.com/huangyihe
+- Community: https://t.zsxq.com/19IaNz5wK
+
 ## ✨ Key Features
 
 - **Prompt Management**: Effortlessly save, tag, and manage your entire prompt library. Our clean interface allows you to find, view, and edit prompts in seconds. Use tags to instantly filter and locate the exact prompt you need.
@@ -23,9 +29,13 @@ It leverages the MCP (Model Context Protocol), which allows your AI applications
 - HTTP Bridge  
 - DXT Extension
 
+![Web Version Setup](11.png)
+
 **For the macOS App:**
 - Manual Configuration: Set up a connection via HTTP or Stdio
 - Auto-Configuration: Enjoy one-click setup for Claude Desktop
+
+![macOS App Setup](22.png)
 
 ---
 
